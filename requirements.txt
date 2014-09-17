@@ -1,0 +1,16 @@
+Django==1.6.5
+South==1.0
+amqp==1.4.5
+anyjson==0.3.3
+billiard==3.3.0.18
+django-google-charts==0.1.1
+django-qsstats-magic==0.7.2
+kombu==3.0.21
+python-dateutil==2.2
+python-memcached==1.53
+pytz==2014.4
+six==1.7.3
+ws4py==0.3.4
+xlrd==0.9.3
+xlutils==1.7.1
+xlwt==0.7.5

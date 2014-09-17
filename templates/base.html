@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>{% block title %}IAG Toolkit{% endblock %}</title>
+
+        <link href="{{ STATIC_URL }}plugins/bootstrap/bootstrap.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet">
+        <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+        <link href='//fonts.googleapis.com/css?family=Ubuntu:400,700' rel='stylesheet' type='text/css'>
+        <link href="{{ STATIC_URL }}plugins/fancybox/jquery.fancybox.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}plugins/fullcalendar/fullcalendar.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}plugins/xcharts/xcharts.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}plugins/select2/select2.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/style.css" rel="stylesheet">
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <script type="text/javascript">
+            {% block other_jscript %}{% endblock %}
+        </script>
+    </head>
+
+    <body>
+
+        {% url "home" as home %}
+        {% url "refresh_db" as refresh_db %}
+        {% url "settings" as settings %}
+        {% url "map_detail" as map_detail %}
+        {% url "my_maps" as my_maps %}
+        {% url "audit_lead_report" as al_maps %}
+        {% url "team_lead_report" as tl_maps %}
+        {% url "business_unit_report" as bu_maps %}
+        {% url "risk_type_report" as rt_maps %}
+        {% url 'prelim' as prelim_val %}
+        {% url 'team_lead' as tl_val %}
+        {% url 'audit_lead' as al_val %}
+        {% url 'search' as search %}
+
+        <header class="navbar hidden-print">
+            <div class="container-fluid expanded-panel">
+                <div class="row">
+                    <div id="logo" class="col-xs-12 col-sm-2">
+                        <a href="{{ home }}">IAG ToolKIT v{% block version %}0.0.1{% endblock %}</a>
+                    </div>
+                    <div id="top-panel" class="col-xs-12 col-sm-10">
+                        <div class="row">
+                            <div class="col-xs-8 col-sm-4">
+                                <a href="#" class="show-sidebar">
+                                  <i class="fa fa-bars"></i>
+                                </a>
+                                <div id="search">
+                                    <input id="search_field" type="text" placeholder="Search by MAP ID...">
+                                    <i class="fa fa-search"></i>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-sm-8 top-panel-right">
+                                <ul class="nav navbar-nav pull-right panel-menu">
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle account" data-toggle="dropdown">
+                                            <i class="fa fa-angle-down pull-right"></i>
+                                            <div class="user-mini pull-right">
+                                                <span class="welcome">Welcome,</span>
+                                                <span>{{ CURRENT_USER_NAME }}</span>
+                                            </div>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a href="{{ settings }}">
+                                                    <i class="fa fa-cog"></i>
+                                                    <span class="hidden-sm text">Team Settings</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ refresh_db }}">
+                                                    <i class="fa fa-refresh"></i>
+                                                    <span class="hidden-sm text">Sync Database</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div id="main" class="container-fluid">
+            <div class="row">
+                <div id="sidebar-left" class="col-xs-2 col-sm-2 hidden-print">
+                    <ul class="nav main-menu">
+                        <li>
+                            <a href="{{ home }}" {% if request.path == home %} class="active" {% endif %}">
+                                <i class="fa fa-dashboard"></i>
+                                <span class="hidden-xs">Overview</span>
+                            </a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle">
+                                <i class="fa fa-bar-chart-o"></i>
+                                <span class="hidden-xs">Reports</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li {% if request.path == my_maps %} class="active" {% endif %}><a href="{{ my_maps }}">My MAP Summary</a></li>
+                                <li {% if request.path == al_maps %} class="active" {% endif %}><a href="{{ al_maps }}?id=team">Audit Lead Reports</a></li>
+                                <li {% if request.path == tl_maps %} class="active" {% endif %}><a href="{{ tl_maps }}">Team Lead Reports</a></li>
+                                <li {% if request.path == bu_maps %} class="active" {% endif %}><a href="{{ bu_maps }}">Summary by Business Unit</a></li>
+                                <li {% if request.path == rt_maps %} class="active" {% endif %}><a href="{{ rt_maps }}">Summary by Risk</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="{{ search }}" {% if request.path == search %} class="active" {% endif %}">
+                                <i class="fa fa-search"></i>
+                                <span class="hidden-xs">Advanced Search</span>
+                            </a>
+                        </li>
+                        <li class="disabled"><h4><span class="label label-default" style="margin-left:15px;">Last Data Refresh: {{ DB_REFRESH_DATE }}</span></h4></li>
+                    </ul>
+                </div>
+
+                <!--Start Content-->
+                <div id="content" class="col-xs-12 col-sm-10" style="padding-top: 20px;">
+                    <h2>{% block header %}{% endblock %}</h2>
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Bootstrap core JavaScript
+        ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script src="{{ STATIC_URL }}plugins/jquery/jquery-2.1.0.min.js"></script>
+        <script src="{{ STATIC_URL }}plugins/jquery-ui/jquery-ui.min.js"></script>
+        <script src="{{ STATIC_URL }}plugins/tablesorter/jquery.tablesorter.js"></script>
+
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <script src="{{ STATIC_URL }}plugins/bootstrap/bootstrap.min.js"></script>
+        <script src="{{ STATIC_URL }}plugins/justified-gallery/jquery.justifiedgallery.min.js"></script>
+        <script src="{{ STATIC_URL }}plugins/tinymce/tinymce.min.js"></script>
+        <script src="{{ STATIC_URL }}plugins/tinymce/jquery.tinymce.min.js"></script>
+        <!-- All functions for this theme + document.ready processing -->
+        <script src="{{ STATIC_URL }}js/devoops.js"></script>
+    </body>
+</html>

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Database Refresh{% endblock %}
+
+{% block content %}
+
+<h1 class="text-info">Refreshing the Database <small>This may take a while...</small></h1>
+<br>
+<div class="well well-lg">
+<h3 class="text-danger"><span class="glyphicon glyphicon-refresh"></span> No Really, this may take a while...</h3>
+<br>
+    <p class="text-info">
+    This page will not refresh, but don't worry, work is being done. You will automatically be redirected once the refresh is complete.
+
+    If you're not a fan of the way this is performed, then help me build a case for getting a dedicated web server where we can set up asynchronous task scheduling.
+    That will allow the application to update the database and refresh the webpage with status updates of the refresh... <span class="glyphicon glyphicon-fire"></span>
+    </p>
+
+</div>
+
+
+<script type="text/javascript">
+jQuery(document).ready(function() {
+    update_database();
+
+
+/*-------------------------------------------
+	Database Refresh Functions
+---------------------------------------------*/
+
+function update_database() {
+    $.ajax({
+        url: "poll_state/",
+        type: "POST",
+        data: "None"
+    }).done(function(status) {
+
+        if (status.Code == 'SUCCESS'){
+
+            alert(status.Message);
+            window.location.replace("redirect/");
+
+        }else {
+
+            alert(status.Message);
+            window.location.replace("redirect/");
+
+        }
+
+    });
+}
+
+});
+</script>
+
+
+{% endblock %}

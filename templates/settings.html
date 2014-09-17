@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+
+{% block title %}IAG Toolkit | Team Setup{% endblock %}
+
+{% block header %}User Settings: <small>Team Setup</small>{% endblock %}
+
+{% block content %}
+
+<script type="text/javascript">
+/*-------------------------------------------
+	User Settings Functions
+---------------------------------------------*/
+
+function search_names(search_field){
+
+    var q = document.getElementById(search_field).value;
+
+    if (q.length > 2){
+        $.ajax({
+            url: "search/",
+            method: "POST",
+            dataType:'json',
+            data: {"value": q},
+            success: function(result) {
+
+            if (result.length > 0){
+                $("#" + search_field + "_search").show();
+
+                var e = document.getElementById(search_field + "_search");
+                e.innerHTML = '';
+                $.each(result, function(key, item){
+
+                    var li = document.createElement("li");
+                    li.setAttribute("role", "presentation");
+
+                    var a = document.createElement("a");
+                    a.setAttribute("role", "menuitem");
+                    a.setAttribute("tabindex", "-1");
+                    a.setAttribute("href", "#");
+                    a.setAttribute("onclick", "set_user('" + search_field + "', '" + item['pk'] + "', '" + item['fields']['name'] + "');");
+                    a.innerHTML = item["fields"]["name"];
+
+                    li.appendChild(a);
+                    e.appendChild(li);
+                });
+
+            } else {
+                $("#" + search_field + "_search").hide();
+            }
+        }
+    });
+
+    } else {
+        $("#" + search_field + "_search").hide();
+    }
+}
+
+function set_user(field_id, id, name){
+    $("#" + field_id + "_search").hide();
+
+    var e = document.getElementById(field_id);
+    e.value = name;
+    e.setAttribute("user_id", id);
+
+}
+
+function remove_field(field_id){
+
+    var results = field_id.split("_");
+    var index = parseInt(results[results.length - 1]);
+    if (index > 1) {
+        var elem = document.getElementById(field_id);
+        var par1 = elem.parentNode;
+        par1.parentNode.remove();
+    }
+
+}
+
+Element.prototype.remove = function() {
+    this.parentElement.removeChild(this);
+}
+NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+    for(var i = 0, len = this.length; i < len; i++) {
+        if(this[i] && this[i].parentElement) {
+            this[i].parentElement.removeChild(this[i]);
+        }
+    }
+}
+
+function add_field(group_id, item_id){
+
+    var next_count = $('#' + group_id + ' div').size() + 1;
+    var e = document.getElementById(group_id);
+
+    var button = document.createElement('button');
+    button.setAttribute("type", "button");
+    button.setAttribute("class", "btn btn-primary");
+    button.setAttribute("onclick", "remove_field('" + item_id + next_count + "');");
+    button.innerHTML = "Remove";
+
+    var span = document.createElement('span');
+    span.setAttribute('class', 'input-group-btn');
+    span.appendChild(button);
+
+    var input = document.createElement('input');
+    input.setAttribute("id", item_id + next_count);
+    input.setAttribute("class", "dropdown-toggle textinput textInput form-control");
+    input.setAttribute("type", "text");
+    input.setAttribute("data-toggle", "dropdown");
+    input.setAttribute("onkeyup", "search_names('" + item_id + next_count + "');");
+
+    var input_group = document.createElement('div');
+    input_group.setAttribute('class', 'input-group');
+    input_group.appendChild(input);
+    input_group.appendChild(span);
+
+    var ul = document.createElement('ul');
+    ul.setAttribute("id", item_id + next_count + "_search");
+    ul.setAttribute("class", "dropdown-menu");
+    ul.setAttribute("role", "menu");
+
+    var drop = document.createElement('div');
+    drop.setAttribute("class", "dropdown");
+    drop.setAttribute("style", "margin-bottom: 10px;");
+    drop.appendChild(input_group);
+    drop.appendChild(ul);
+
+    e.appendChild(drop);
+}
+
+function save_settings(){
+
+    var current_user = document.getElementById('current_user').getAttribute('user_id');
+    var audit_lead = document.getElementById('audit_lead').getAttribute('user_id');
+    var team_leads = strip_user_ids('team_tl')
+    var team_members = strip_user_ids('team_tm')
+    var team_lead = document.getElementById('subteam_lead').getAttribute('user_id');
+    var tl_members = strip_user_ids('subteam_tm');
+
+    team_data = {
+        'current_user': current_user,
+        'audit_team': {
+            'audit_lead': audit_lead,
+            'team_leads': team_leads,
+            'members': team_members,
+        },
+        'sub_team': {
+            'team_lead': team_lead,
+            'members': tl_members,
+        },
+    };
+
+    $.ajax({
+        url: "save/",
+        method: "POST",
+        content_type: "application/json",
+        data: {"team_setup": JSON.stringify(team_data)},
+        success: function(result) {
+            alert('Settings have been saved successfully');
+            window.location.replace("redirect/");
+        }
+    });
+
+}
+
+function strip_user_ids(fieldset_id){
+    var results = [];
+    var group = document.getElementById(fieldset_id).children;
+    for (i=0; i < group.length; i++){
+        var input = group[i].children[0].children[0];
+        if (input.tagName == 'INPUT' && input.getAttribute('user_id') != null){
+            results.push(input.getAttribute('user_id'));
+        }
+    }
+
+    return results
+}
+
+</script>
+
+<form method="post">
+    <div class="row">
+        <p class="col-md-10">Fill out the following form to ensure the most accurate team reporting and to track the action plans for which you are responsible.</p>
+        <p class="col-md-2"><button type="button" class="btn btn-info col-md-12 text-right" onclick="save_settings();">Save Settings</button></p>
+    </div>
+    <br>
+
+    <!-- Current User -->
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <fieldset>
+                <legend>
+                    <h3>Current User:
+                        <small>Required for My Map Report</small>
+                    </h3>
+                </legend>
+                <div class="dropdown">
+                    <div id="div_id_current_user" class="form-group">
+                        <div class="controls ">
+                            {% if current_user %}
+                            <input class="dropdown-toggle textinput textInput form-control"
+                                   data-toggle="dropdown" id="current_user"
+                                   maxlength="200" name="current_user"
+                                   onkeyup="search_names(&#39;current_user&#39;);"
+                                   type="text" user_id="{{ current_user.id }}" value="{{ current_user }}"/>
+                            {% else %}
+                            <input class="dropdown-toggle textinput textInput form-control"
+                                   data-toggle="dropdown" id="current_user"
+                                   maxlength="200" name="current_user"
+                                   onkeyup="search_names(&#39;current_user&#39;);"
+                                   placeholder="Your Name Here..." type="text"/>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <ul id="current_user_search" class="dropdown-menu"
+                        role="menu"></ul>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    <!-- Audit Team -->
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <fieldset>
+                <legend>
+                    <h3>Full Audit Team:
+                        <small>Required for full Audit Lead Reports</small>
+                    </h3>
+                </legend>
+            </fieldset>
+            <fieldset>
+                <legend>
+                    <small>Audit Lead</small>
+                </legend>
+                <div class="dropdown">
+                    <div class="form-group">
+                        {% if audit_lead %}
+                        <input class="dropdown-toggle textinput textInput form-control"
+                               data-toggle="dropdown" id="audit_lead"
+                               onkeyup="search_names(&#39;audit_lead&#39;);"
+                               type="text" value="{{ audit_lead }}" user_id="{{ audit_lead.id }}"/>
+                        {% else %}
+                        <input class="dropdown-toggle textinput textInput form-control"
+                               data-toggle="dropdown" id="audit_lead"
+                               onkeyup="search_names(&#39;audit_lead&#39;);"
+                               placeholder="Audit Lead for your team..."
+                               type="text"/>
+                        {% endif %}
+                    </div>
+                    <ul id="audit_lead_search" class="dropdown-menu" role="menu"></ul>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>
+                    <small>Team Leaders</small>
+                </legend>
+                <div id="team_tl">
+                    {% if team_leads %}
+                        {% for lead in team_leads %}
+                            {% if forloop.counter > 1 %}
+                            <div class="dropdown" style="margin-bottom: 10px;">
+                                <div class="input-group" >
+                            {% else %}
+                            <div class="dropdown">
+                                <div class="form-group">
+                            {% endif %}
+                                    <input class="dropdown-toggle textinput textInput form-control" id="team_leader_{{ forloop.counter }}" type="text" data-toggle="dropdown" user_id="{{ lead.id }}" value="{{ lead }}"/>
+                                    {% if forloop.counter > 1 %}
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-primary" onclick="remove_field('team_leader_{{ forloop.counter }}');">Remove</button>
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <ul id="team_leader_{{ forloop.counter }}_search" class="dropdown-menu" role="menu"></ul>
+                            </div>
+
+                        {% endfor %}
+                    {% else %}
+                    <div class="dropdown">
+                        <div class="form-group">
+                            <input class="dropdown-toggle textinput textInput form-control"
+                                   id="team_leader_1" type="text"
+                                   data-toggle="dropdown"
+                                   onkeyup="search_names(&#39;team_leader_1&#39;);"
+                                   placeholder="Audit Team Leader..."/>
+                        </div>
+                        <ul id="team_leader_1_search" class="dropdown-menu"
+                            role="menu"></ul>
+                    </div>
+                    {% endif %}
+                </div>
+                <button type="button" class="btn btn-primary" onclick="add_field('team_tl', 'team_leader_');">Add Field</button>
+            </fieldset>
+            <br>
+            <fieldset>
+                <legend>
+                    <small>Members</small>
+                </legend>
+                <div id="team_tm">
+                    {% if team_members %}
+                        {% for member in team_members %}
+                            {% if forloop.counter > 1 %}
+                                <div class="dropdown" style="margin-bottom: 10px;">
+                                <div class="input-group">
+                            {% else %}
+                                <div class="dropdown">
+                                <div class="form-group">
+                            {% endif %}
+
+                            <input class="dropdown-toggle textinput textInput form-control" id="team_auditor_{{ forloop.counter }}" user_id="{{ member.id }}" value="{{ member }}" type="text" data-toggle="dropdown" onkeyup="search_names(&#39;team_auditor_{{ forloop.counter }}&#39;);" placeholder="Audit Team member..."/>
+                            {% if forloop.counter > 1 %}
+                                <span class="input-group-btn">
+                                <button type="button" class="btn btn-primary" onclick="remove_field('team_auditor_{{ forloop.counter }}');">Remove</button>
+                                </span>
+                            {% endif %}
+                            </div>
+                            <ul id="team_auditor_{{ forloop.counter }}_search" class="dropdown-menu" role="menu"></ul>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="dropdown">
+                        <div class="form-group">
+                            <input class="dropdown-toggle textinput textInput form-control" id="team_auditor_1" type="text" data-toggle="dropdown" onkeyup="search_names(&#39;team_auditor_1&#39;);" placeholder="Audit Team member..."/>
+                        </div>
+                        <ul id="team_auditor_1_search" class="dropdown-menu"
+                            role="menu"></ul>
+                        </div>
+                    {% endif %}
+
+                </div>
+                <button type="button" class="btn btn-primary" onclick="add_field('team_tm', 'team_auditor_');">Add Field</button>
+            </fieldset>
+        </div>
+    </div>
+
+    <!-- Team Lead Group -->
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <h3>Audit Team by Team Lead:
+                <small>Required for Team Lead Reports</small>
+            </h3>
+            <fieldset>
+                <legend>
+                    <small>Team Leader</small>
+                </legend>
+                <div class="dropdown">
+                    <div class="form-group">
+                        {% if sub_team_lead %}
+                        <input class="dropdown-toggle textinput textInput form-control"
+                               data-toggle="dropdown" id="subteam_lead"
+                               onkeyup="search_names(&#39;subteam_lead&#39;);"
+                               type="text" value="{{ sub_team_lead }}" user_id="{{ sub_team_lead.id }}"/>
+                        {% else %}
+                        <input class="dropdown-toggle textinput textInput form-control"
+                               data-toggle="dropdown" id="subteam_lead"
+                               onkeyup="search_names(&#39;subteam_lead&#39;);"
+                               placeholder="Your Team Lead..."
+                               type="text"/>
+                        {% endif %}
+                    </div>
+                    <ul id="subteam_lead_search" class="dropdown-menu" role="menu"></ul>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>
+                    <small>Members</small>
+                </legend>
+                <div id="subteam_tm">
+                    {% if sub_team_members %}
+                        {% for member in sub_team_members %}
+                            {% if forloop.counter > 1 %}
+                                <div class="dropdown" style="margin-bottom: 10px;">
+                                <div class="input-group">
+                            {% else %}
+                                <div class="dropdown">
+                                <div class="form-group">
+                            {% endif %}
+
+                            <input class="dropdown-toggle textinput textInput form-control" id="subteam_auditor_{{ forloop.counter }}" user_id="{{ member.id }}" value="{{ member }}" type="text" data-toggle="dropdown" onkeyup="search_names(&#39;subteam_auditor_{{ forloop.counter }}&#39;);" placeholder="Team member..."/>
+                            {% if forloop.counter > 1 %}
+                                <span class="input-group-btn">
+                                <button type="button" class="btn btn-primary" onclick="remove_field('subteam_auditor_{{ forloop.counter }}');">Remove</button>
+                                </span>
+                            {% endif %}
+                            </div>
+                            <ul id="subteam_auditor_{{ forloop.counter }}_search" class="dropdown-menu" role="menu"></ul>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="dropdown">
+                        <div class="form-group">
+                            <input class="dropdown-toggle textinput textInput form-control" id="subteam_auditor_1" type="text" data-toggle="dropdown" onkeyup="search_names(&#39;subteam_auditor_1&#39;);" placeholder="Team Member..."/>
+                        </div>
+                        <ul id="subteam_auditor_1_search" class="dropdown-menu"
+                            role="menu"></ul>
+                        </div>
+                    {% endif %}
+                </div>
+                <button type="button" class="btn btn-primary"
+                        onclick="add_field('subteam_tm', 'subteam_auditor_');">
+                    Add Field
+                </button>
+            </fieldset>
+
+        </div>
+    </div>
+</form>
+
+{% endblock %}

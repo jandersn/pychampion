@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+{% load googlecharts %}
+
+{% block header %}{{ report_header }}
+    {% if "ERROR" in sub_header %}
+        <small class="label label-warning">
+    {% else %}
+        <small>
+    {% endif %}
+    {{ sub_header }}</small>
+{% endblock %}
+
+{% block other_jscript %}
+
+$(document).ready(function(){
+    $(".support_table").tablesorter({
+         sortList: [[0,0],[6,0]]
+    });
+});
+
+{% endblock %}
+
+{% block content %}
+
+<p>{% block narrative %}{% endblock %}</p>
+
+{% block finding_map_count %}{% endblock %}
+
+<h4 class="text-primary">Review Aging: <small>Status of IAG Validation</small></h4>
+<div class="row">
+    <div class="col-md-8">
+        <table class="table table-bordered table-striped">
+            <tr class="info">
+                <th class="text-info col-md-4">Aging</th>
+                <th class="text-info col-md-2 text-center">High</th>
+                <th class="text-info col-md-2 text-center">Medium</th>
+                <th class="text-info col-md-2 text-center">Low</th>
+                <th class="text-info col-md-2 text-center">Total</th>
+            </tr>
+            {% for row in aging_data.0 %}
+                <tr>
+                {% for cell in row %}
+                    {% if forloop.first %}
+                        <td>{{ cell }}</td>
+                    {% else %}
+                        <td class="text-center">{{ cell }}</td>
+                    {% endif %}
+                {% endfor %}
+                </tr>
+            {% empty %}
+                <tr><td>An error occurred calculating aging data</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-4 hidden-print">
+        <div id="aging_chart" style="width: 100%;"></div>
+    </div>
+
+</div>
+
+<h4 class="text-primary">Status Summary</h4>
+<div class="row">
+    <div class="col-md-8">
+        <table class="table table-bordered table-striped">
+            <tr class="info">
+                <th class="text-info col-md-4">Status</th>
+                <th class="text-info col-md-2 text-center">High</th>
+                <th class="text-info col-md-2 text-center">Medium</th>
+                <th class="text-info col-md-2 text-center">Low</th>
+                <th class="text-info col-md-2 text-center">Total</th>
+            </tr>
+            {% for row in status_data.0 %}
+                <tr>
+                {% for cell in row %}
+                    {% if forloop.first %}
+                        <td>{{ cell }}</td>
+                    {% else %}
+                        <td class="text-center">{{ cell }}</td>
+                    {% endif %}
+                {% endfor %}
+                </tr>
+            {% empty %}
+                <tr><td>An error occurred calculating status data</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-4 hidden-print">
+        <div id="status_chart" style="width: 100%;"></div>
+    </div>
+</div>
+
+<h4 class="text-primary">Open MAP Forecasting: <small>Action plans to watch</small></h4>
+<div class="row">
+    <div class="col-md-8">
+        <table class="table table-bordered table-striped">
+            <tr class="info">
+                <th class="text-info col-md-4">Open Forecast</th>
+                <th class="text-info col-md-2 text-center">High</th>
+                <th class="text-info col-md-2 text-center">Medium</th>
+                <th class="text-info col-md-2 text-center">Low</th>
+                <th class="text-info col-md-2 text-center">Total</th>
+            </tr>
+            {% for row in open_data.0 %}
+                <tr>
+                {% for cell in row %}
+                    {% if forloop.first %}
+                        <td>{{ cell }}</td>
+                    {% else %}
+                        <td class="text-center">{{ cell }}</td>
+                    {% endif %}
+                {% endfor %}
+                </tr>
+            {% empty %}
+                <tr><td>An error occurred calculating open data</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-4 hidden-print">
+        <div id="open_aging_chart" style="width: 100%;"></div>
+    </div>
+</div>
+
+{% block other_summary %}{% endblock %}
+
+<div class="row" style="margin:5px;">
+    <h4 class="text-primary">Search Results <span class="badge">{{ maps|length }}</span></h4>
+    <table class="table table-bordered table-hover table-striped tablesorter support_table">
+        <thead>
+        <tr class="info">
+            <th class="col-md-1 hidden-print">Audit #</th>
+            <th class="col-md-1">Audit</th>
+            <th class="col-md-1 hidden-print">Finding ID</th>
+            <th class="col-md-1">MAP ID</th>
+            <th class="col-md-1">Risk</th>
+            <th class="col-md-1">Status</th>
+            <th class="col-md-1">Due Date</th>
+            <th class="col-md-1 hidden-print">Review Due Date</th>
+            <th class="col-md-1">Days in Review</th>
+            <th class="col-md-1">Reviewer</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for m in maps %}
+        <tr>
+            <td class="hidden-print">{{ m.finding.audit_number }}</td>
+            <td>{{ m.finding.audit_name }}</td>
+            <td class="hidden-print">{{ m.finding.id }}</td>
+            <td><a href="{% url 'map_detail' %}?map={{ m.id }}">{{ m.id }}</a></td>
+            <td>{{ m.finding.risk }}</td>
+            <td>{{ m.real_status }}</td>
+            <td>{{ m.real_due_date }}</td>
+            <td class="hidden-print">{{ m.review_due_date }}</td>
+            <td>{{ m.days_in_review }}</td>
+            <td>{{ m.current_reviewer }}</td>
+        </tr>
+        {% empty %}
+            <tr><td>No Non-Closed MAPs Returned</td></tr>
+        {% endfor %}
+
+
+        </tbody>
+    </table>
+</div>
+
+
+{% googlecharts %}
+
+    {% if aging_data.1 %}
+        {% data aging_data.1 "aging_out" %}
+            {% col "string" "Aging Status" %}"{{ val }}"{% endcol %}
+            {% col "number" "Total" %}{{ val }}{% endcol %}
+        {% enddata %}
+        {% options "aging_options" %}
+            kind: "BarChart",
+            options: {
+                backgroundColor: "#d9edf7",
+                height: 223,
+                legend: 'none',
+                hAxis: {minValue: 0},
+                chartArea: {
+                    backgroundColor: "#fff",
+                    left: 120,
+                    height: 180
+                }
+            },
+
+        {% endoptions %}
+
+        {# chart is assembled from container, data and options #}
+        {% graph "aging_chart" "aging_out" "aging_options" %}
+    {% endif %}
+    {% if status_data.1 %}
+        {% data status_data.1 "status_out" %}
+            {% col "string" "Status Summary" %}"{{ val }}"{% endcol %}
+            {% col "number" "Total" %}{{ val }}{% endcol %}
+        {% enddata %}
+        {% options "status_options" %}
+            kind: "BarChart",
+            options: {
+                backgroundColor: "#d9edf7",
+                height: 223,
+                hAxis: {minValue: 0},
+                legend: 'none',
+                chartArea: {
+                    backgroundColor: "#fff",
+                    left: 120,
+                    height: 180
+                }
+            },
+        {% endoptions %}
+
+        {# chart is assembled from container, data and options #}
+        {% graph "status_chart" "status_out" "status_options" %}
+    {% endif %}
+    {% if open_data.1 %}
+        {% data open_data.1 "open_out" %}
+            {% col "string" "Open Forecast" %}"{{ val }}"{% endcol %}
+            {% col "number" "Total" %}{{ val }}{% endcol %}
+        {% enddata %}
+        {% options "open_options" %}
+            kind: "BarChart",
+            options: {
+                backgroundColor: "#d9edf7",
+                height: 223,
+                legend: 'none',
+                hAxis: {minValue: 0},
+                chartArea: {
+                    backgroundColor: "#fff",
+                    left: 120,
+                    height: 180
+                }
+            },
+
+        {% endoptions %}
+
+        {# chart is assembled from container, data and options #}
+        {% graph "open_aging_chart" "open_out" "open_options" %}
+    {% endif %}
+
+    {% if reviewer_data.1 %}
+        {% data reviewer_data.1 "reviewer_out" %}
+            {% col "string" "Current Reviewer" %}"{{ val }}"{% endcol %}
+            {% col "number" "Total" %}{{ val }}{% endcol %}
+        {% enddata %}
+        {% options "reviewer_options" %}
+            kind: "BarChart",
+            options: {
+                backgroundColor: "#d9edf7",
+                height: {{ reviewer_chart_height.0 }},
+                legend: 'none',
+                hAxis: {minValue: 0},
+                chartArea: {
+                    backgroundColor: "#fff",
+                    left: 120,
+                    height: {{ reviewer_chart_height.1 }},
+                }
+            },
+
+        {% endoptions %}
+
+        {# chart is assembled from container, data and options #}
+        {% graph "reviewer_chart" "reviewer_out" "reviewer_options" %}
+    {% endif %}
+
+    {% if ytd_data %}
+        {% data ytd_data "ytd_out" %}
+            {% col "string" "Risk" %}"{{ val }}"{% endcol %}
+            {% col "number" "YTD" %}{{ val }}{% endcol %}
+            {% col "number" "Prior Year" %}{{ val }}{% endcol %}
+            {% col "number" "2 Years Prior" %}{{ val }}{% endcol %}
+        {% enddata %}
+        {% options "ytd_options" %}
+            kind: "ColumnChart",
+            options: {
+                backgroundColor: "#d9edf7",
+                height: 375,
+                chartArea: {
+                    backgroundColor: "#fff",
+                }
+            },
+
+        {% endoptions %}
+
+        {# chart is assembled from container, data and options #}
+        {% graph "ytd_chart" "ytd_out" "ytd_options" %}
+
+    {% endif %}
+
+{% endgooglecharts %}
+
+{% endblock %}

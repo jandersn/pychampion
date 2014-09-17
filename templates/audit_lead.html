@@ -1,0 +1,65 @@
+{% extends "base_report.html" %}
+
+{% block title %}Report: {{ sub_header }}{% endblock %}
+
+{% block narrative %}
+<div class="well">
+    The following report summarizes every non-closed MAP by Audit Team configured in <a href="{% url 'settings' %}">Settings</a> for your <em>Audit Lead</em>. MAPs are pulled for each team member
+    where he/she is either a <em>Responsible Auditor</em> on the Finding or a <em>Reviewer</em> on the Action Plan. While all these MAPs may not be currently in the team members' queue,
+    they should be tracking them to make sure they get reviewed and closed timely. <br><br>
+
+    This report can also summarize MAPs by the <em>Responsible AL</em> on the Finding. If the report summarizes by <em>Responsible AL</em>, no consideration will be made for the configured settings.
+</div>
+
+<div class="dropdown pull-right hidden-print" style="margin-top:-10px;">
+  <button class="btn btn-info dropdown-toggle col-md-12" type="button" id="dropdownMenu1" data-toggle="dropdown">
+    Choose Report
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url 'audit_lead_report' %}?id=team">Use Team Settings</a></li>
+    <li role="presentation" class="divider"></li>
+      {% for al in al_list %}
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url 'audit_lead_report' %}?id={{ al.id|urlencode }}">{{ al }}</a></li>
+    {% endfor %}
+    <li role="presentation" class="divider"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url 'audit_lead_report' %}?id=None">Findings with no AL</a></li>
+  </ul>
+</div>
+{% endblock %}
+
+
+{% block other_summary %}
+<h4 class="text-primary">Team Summary: <small>Current Reviewer Queue</small></h4>
+<div class="row">
+    <div class="col-md-8">
+        <table class="table table-bordered table-striped">
+            <tr class="info">
+                <th class="text-info col-md-4">Reviewer</th>
+                <th class="text-info col-md-2 text-center">Late Review</th>
+                <th class="text-info col-md-2 text-center">In Review</th>
+                <th class="text-info col-md-2 text-center">Due from Client</th>
+                <th class="text-info col-md-2 text-center">Total</th>
+            </tr>
+            {% for row in reviewer_data.0 %}
+                <tr>
+                {% for cell in row %}
+                    {% if forloop.first %}
+                        <td>{{ cell }}</td>
+                    {% else %}
+                        <td class="text-center">{{ cell }}</td>
+                    {% endif %}
+                {% endfor %}
+                </tr>
+            {% empty %}
+                <tr><td>No MAPs Returned</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-4 hidden-print">
+        <div id="reviewer_chart" style="width: 100%;"></div>
+    </div>
+</div>
+
+{% endblock %}
+

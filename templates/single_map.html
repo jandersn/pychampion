@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}IAG Toolkit | MAP {{ map.id }} Detail{% endblock %}
+{% block header %}MAP Detail <small>{{ map.id }}</small>{% endblock %}
+{% block content %}
+<br>
+
+{% if map.is_past_due %}
+<div class="alert alert-danger" role="alert">
+    <strong>MAP Past Due!</strong> Evidence for MAP closure was due on {{ map.real_due_date }}. Status indicates this MAP is still <strong>Open</strong>
+</div>
+{% endif %}
+
+{% if map.review_is_late %}
+<div class="alert alert-danger" role="alert">
+    <strong>Review is Late!</strong>
+    Total days in review: <strong>{{ map.days_in_review }}</strong>
+</div>
+{% endif %}
+
+
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <h3 class="panel-title"><strong>Finding:</strong> {{ map.finding.title }}</h3>
+    </div>
+    <div class="panel-body">
+        {{ map.finding.detail }}
+    </div>
+    <table class="table table-bordered">
+        <tr>
+            <td class="col-md-1"><strong>Audit Number</strong></td>
+            <td class="col-md-3">{{ map.finding.audit_number }}</td>
+            <td class="col-md-1"><strong>Audit Name</strong></td>
+            <td class="col-md-3">{{ map.finding.audit_name }}</td>
+            <td class="col-md-1"><strong>Finding ID</strong></td>
+            <td class="col-md-3">{{ map.finding.id }}</td>
+        </tr>
+        <tr>
+            <td><strong>Status</strong></td>
+            <td>{{ map.finding.status }}</td>
+            <td><strong>Risk</strong></td>
+            <td>{{ map.finding.risk }}</td>
+            <td><strong>Risk Type</strong></td>
+            <td>{{ map.finding.risk_type }}</td>
+        </tr>
+        <tr>
+            <td><strong>Due Date</strong></td>
+            <td>{{ map.finding.due_date }}</td>
+            <td><strong>Revised Due Date</strong></td>
+            <td>{{ map.finding.revised_due_date }}</td>
+            <td><strong>Completion Date</strong></td>
+            <td>{{ map.finding.completion_date }}</td>
+        </tr>
+        <tr>
+            <td><strong>MSI</strong></td>
+            <td>{{ map.finding.msi }}</td>
+            <td><strong>Repeat Finding</strong></td>
+            <td>{{ map.finding.repeat }}</td>
+            <td><strong>Consumer Harm</strong></td>
+            <td>{{ map.finding.consumer_harm }}</td>
+        </tr>
+        <tr>
+            <td><strong>Owner</strong></td>
+            <td>{{ map.finding.owner }}</td>
+            <td><strong>Owner Business</strong></td>
+            <td>{{ map.finding.owner_bu }}</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><strong>Responsible PGA</strong></td>
+            <td>{{ map.finding.responsible_asl }}</td>
+            <td><strong>Responsible AL</strong></td>
+            <td>{{ map.finding.responsible_al }}</td>
+            <td><strong>Responsible Auditors</strong></td>
+            <td>
+                {% for a in map.finding.auditors.all %}
+                    {% if forloop.last %}
+                        {{ a.name }}
+                    {% else %}
+                        {{ a.name }},
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td><strong>In Sustainability</strong></td>
+            <td>{{ map.finding.sustainability }}</td>
+            <td><strong>Sustainability End Date</strong></td>
+            <td>{{ map.finding.sustainability_due_date }}</td>
+            <td><strong>Closed Date</strong></td>
+            <td>{{ map.finding.closed_date }}</td>
+        </tr>
+    </table>
+</div>
+
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <h3 class="panel-title"><strong>Action Plan Detail</strong>
+            <a class="label label-primary pull-right" href="https://client342.accelus.com/RNJ/jsp/login.jsp?LinkTo=/RNJ/action/ActionPlan?ID={{ map.id|cut:'A' }}" style="padding: 8px; color: #fff; margin-top: -5px;">Open MAP in GRC</a>
+        </h3>
+    </div>
+    <div class="panel-body">
+        {{ map.detail }}
+    </div>
+    <table class="table table-bordered">
+        <tr>
+            <td class="col-md-1"><strong>Status</strong></td>
+            <td class="col-md-3">{{ map.real_status }}</td>
+            <td class="col-md-1"><strong>Current Reviewer</strong></td>
+            <td class="col-md-3">{{ map.current_reviewer }}</td>
+            <td class="col-md-1"><strong>Original Due Date</strong></td>
+            <td class="col-md-3">{{ map.due_date }}</td>
+        </tr>
+        <tr>
+            <td class="col-md-1"><strong>Revised Due Date</strong></td>
+            <td class="col-md-3">{{ map.revised_due_date }}</td>
+            <td class="col-md-1"><strong>Completion Date</strong></td>
+            <td class="col-md-3">{{ map.completion_date }}</td>
+            <td class="col-md-1"><strong>Sustainability Due Date</strong></td>
+            <td class="col-md-3">{{ map.sustainability_due_date }}</td>
+        </tr>
+        <tr>
+            {% if map.is_past_due %}
+            <td><strong>MAP Past Due</strong></td>
+            <td>{{ map.is_past_due }}</td>
+            {% else %}
+            <td><strong>Days Until Due</strong></td>
+            <td>{{ map.due_date_forecast_count }}</td>
+            {% endif %}
+            <td><strong>Review Late</strong></td>
+            <td>{{ map.review_is_late }}</td>
+            <td><strong>Days in Review</strong></td>
+            <td>{{ map.days_in_review }}</td>
+        </tr>
+        <tr>
+            <td><strong>Owner</strong></td>
+            <td>{{ map.owner }}</td>
+            <td><strong>Owner BU</strong></td>
+            <td>{{ map.owner_bu }}</td>
+            <td><strong>Closed Date</strong></td>
+            <td>{{ map.closed_date }}</td>
+        </tr>
+    </table>
+</div>
+
+{% endblock %}

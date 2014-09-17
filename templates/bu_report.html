@@ -1,0 +1,65 @@
+{% extends "base_report.html" %}
+
+{% block narrative %}
+<div class="well">
+    The following report summarizes every non-closed MAP by the designated <strong>Business Unit</strong> of the MAP Owner. The report defaults to summarizing MAPs where no Business Unit has been provided.
+    The report will then summarize total counts by Finding Responsible AL.
+</div>
+
+<div class="dropdown pull-right hidden-print" style="margin-top:-10px;">
+  <button class="btn btn-info dropdown-toggle col-md-12" type="button" id="dropdownMenu1" data-toggle="dropdown">
+    Choose Report
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+    <li role="presentation" class="divider"></li>
+      {% for bu in bu_list %}
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url 'business_unit_report' %}?unit={{ bu|urlencode }}">{{ bu }}</a></li>
+    {% endfor %}
+    <li role="presentation" class="divider"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url 'business_unit_report' %}">MAPs with no BU</a></li>
+  </ul>
+</div>
+{% endblock %}
+
+{% block finding_map_count %}
+<h4>MAPs Closed <small>Summary by Business Unit</small></h4>
+<div id="ytd_chart"></div>
+{% endblock %}
+
+
+{% block other_summary %}
+
+<h4 class="text-primary">Team Summary: <small>Responsible Audit Lead</small></h4>
+<div class="row">
+    <div class="col-md-8">
+        <table class="table table-bordered table-striped">
+            <tr class="info">
+                <th class="text-info col-md-2">Audit Lead</th>
+                <th class="text-info col-md-2 text-center">Open</th>
+                <th class="text-info col-md-2 text-center">Ready for Review</th>
+                <th class="text-info col-md-2 text-center">In Sustainability</th>
+                <th class="text-info col-md-2 text-center">Recommend Close</th>
+                <th class="text-info col-md-2 text-center">Total</th>
+            </tr>
+            {% for row in reviewer_data.0 %}
+                <tr>
+                {% for cell in row %}
+                    {% if forloop.first %}
+                        <td>{{ cell }}</td>
+                    {% else %}
+                        <td class="text-center">{{ cell }}</td>
+                    {% endif %}
+                {% endfor %}
+                </tr>
+            {% empty %}
+                <tr><td>No Non-Closed MAPs Returned</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-4 hidden-print">
+        <div id="reviewer_chart" style="width: 100%;"></div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}IAG Toolkit: Overview{% endblock %}
+
+{% block content %}
+
+        <div class="jumbotron">
+            <h1>IAG ToolKIT <small>Welcome!</small></h1>
+
+            <p>
+                The aim of this application is to provide a quick, effortless view of the current state of the Management Action Plan validation process across all of IAG.
+            </p>
+        </div>
+
+        <div class="alert alert-danger">
+            <strong>Do Not Close the Terminal Window: </strong> The use of this toolkit requires a light-weight web server to run which you can see in the terminal window that was launched when you ran the toolkit.
+            If you close that terminal, you are effectively exiting the application and the toolkit will no longer function. Attempting to use the toolkit after you closed the terminal will result in
+            a <strong>'Page Not Available'</strong> or similar message. Only close the terminal when you are finished using the toolkit.
+        </div>
+
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                Basic Usage
+            </div>
+            <div class="panel-body">
+
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <h4>Check Your Access</h4>
+                        <p>Make sure you have access to these locations:</p>
+                        <div class="alert alert-info">{{ FINDING_TRACK_REPORT }}</div>
+                        <div class="alert alert-info">{{ OTHER_REPORT }}</div>
+                    </li>
+                    <li class="list-group-item">
+                        <h4>Sync Your Database</h4>
+                        <p>This toolkit is dependent on a Finding Track report which a MAP Champion will replace at the following directory on a weekly basis</p>
+                        <div class="alert alert-info">{{ FINDING_TRACK_REPORT }}</div>
+                        <p>
+                            Keep an eye on the <span class="label label-default">Last Data Refresh: {{ DB_REFRESH_DATE }}</span> label, found in the left-hand column,
+                            to ensure your database is current. If you need to update the database, do so by clicking on <strong><a href="{% url 'refresh_db' %}">Sync Database</a></strong> found
+                            under the dropdown menu in the top right corner. This date reflects the creation date of the Finding Track report. So if the report never changes this date will
+                            never change. Be sure the MAP Champion is replacing the report.
+                        </p>
+                    </li>
+                    <li class="list-group-item">
+                        <h4>Configure Your Settings</h4>
+                        <p>
+                            Many of the reports in this toolkit depend on an initial configuration from the user. Be sure you go to <strong><a href="{%url 'settings' %}">Team Settings</a></strong>,
+                            also found in the dropdown menu in the top right corner, and specify who you are, who is on your audit team, and who your team lead and peers are. Doing so will enable more
+                            accurate reporting as Finding Track allows for multiple reviewers on a MAP. These settings will allow the reports to be filtered down to only those team members you want
+                            to track.
+                        </p>
+
+                    </li>
+
+
+                </ul>
+
+            </div>
+
+        </div>
+
+
+
+{% endblock %}
