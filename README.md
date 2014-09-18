@@ -13,59 +13,6 @@ Recipe
 
 *Tested on Windows*
 
-### Setting Up Python
-
-Follow this [guide](http://docs.python-guide.org/en/latest/starting/install/win/)
-
-##### Setup Virtualenv and Virtualenvwrapper (Optional)
-
-In addition to virtualenv, you can install virtualenvwrapper which makes the use of virtualenv easier.
-
-```
-pip install virtualenvwrapper-win
-```
-
-If you can't install through pip, go to the [python library](https://pypi.python.org/pypi/virtualenvwrapper-win), download and extract the virtualenvwrapper-win to a directory of your choosing.
-
-Open up a CMD window, CD into the library you unpacked. Most of these libraries are packaged in a tar.gz file, which requires a 3rd party extractor to unpack. I prefer 7-Zip, but there are other options. These tar.gz are basically compressed twice, so you'll have to be sure you unpack to the actual files. 
-
-Once unpacked, CD into the library and type the following command:
-
-```
-python setup.py install
-```
-
-*Virtualenv and virtualenvwrapper aren't required, but highly recommended as it sets up a virtual environment for installing all of the python libraries specific to your project. When you start working on multiple projects you'll end up having some library dependency conflicts, unless you have a virtual environment for each project*
-
-### Setting Up Project on Your Machine
-
-##### Install GIT
-
-[Download GIT for Windows](http://git-scm.com/download/win)
-
-##### Download Source Code
-
-```
-git clone https://[your-username]@bitbucket.org/walexnelson/pychampion.git
-```
-
-##### Download Python Libraries
-
-In your CMD window, CD to your project root directory where the ```requirements.txt``` file is located and enter the following command
-
-```
-pip install -r requirements.txt
-```
-
-This command will install all the libraries that are required for pyChampion. 
-
-In addition to the python libraries installed above, you'll have to install the following two libraries manually:
-
-* PyInstaller ([Development](https://github.com/pyinstaller/pyinstaller/zipball/develop)) 
-* PyWin32 ([Build 219](http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/)) 
-
-### Packaging Source
-
 ##### Package pyChampion
 
 Once you have made the needed changes to the source code you are ready to package the app into a distributable exe.
