@@ -22,8 +22,6 @@ Follow this [guide](http://docs.python-guide.org/en/latest/starting/install/win/
 In addition to virtualenv, you can install virtualenvwrapper which makes the use of virtualenv easier.
 
 ```
-#!python
-
 pip install virtualenvwrapper-win
 ```
 
@@ -34,8 +32,6 @@ Open up a CMD window, CD into the library you unpacked. Most of these libraries 
 Once unpacked, CD into the library and type the following command:
 
 ```
-#!python
-
 python setup.py install
 ```
 
@@ -50,8 +46,6 @@ python setup.py install
 ##### Download Source Code
 
 ```
-#!python
-
 git clone https://[your-username]@bitbucket.org/walexnelson/pychampion.git
 ```
 
@@ -60,8 +54,6 @@ git clone https://[your-username]@bitbucket.org/walexnelson/pychampion.git
 In your CMD window, CD to your project root directory where the ```requirements.txt``` file is located and enter the following command
 
 ```
-#!python
-
 pip install -r requirements.txt
 ```
 
@@ -81,29 +73,24 @@ Once you have made the needed changes to the source code you are ready to packag
 CD to your project root and type the following command into your terminal:
 
 ```
-#!python
-
 pyinstaller project.spec
 ```
 
-PyInstaller will create a new directory under ```dist```. Once created you'll have to manually copy the ```static``` and ```templates``` directories and the ```db.sqlite``` database file into the ```pychamp``` directory under ```dist```. 
+PyInstaller will create a new directory under `dist`. Once created you'll have to manually copy the `static` and `templates` directories and the `db.sqlite` database file into the `pychamp` directory under `dist`. 
 
 ##### Package the ZIP Extractor
 
-The following command will create a single exe file in ```dist``` next to the ```pychamp``` directory.
-```
-#!python
+The following command will create a single exe file in `dist` next to the `pychamp` directory.
 
+```
 pyinstaller zip_extract.spec
 ```
 
 ##### Ready Package for Distribution
 
-Once you have run PyInstaller on both the project and the zip_extractor, you are able to zip up the ```pychamp``` directory under the ```dist``` directory. Now you should have the following structure under ```dist```:
+Once you have run PyInstaller on both the project and the zip_extractor, you are able to zip up the `pychamp` directory under the `dist` directory. Now you should have the following structure under `dist`:
 
 ```
-#!python
-
 pychamp
 pychamp.zip
 extract.exe
