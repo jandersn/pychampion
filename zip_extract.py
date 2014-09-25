@@ -31,19 +31,9 @@ def unzip(zip_file, destination):
     """
 
     zfile = zipfile.ZipFile(zip_file)
-    for name in zfile.namelist():
-        (dir_name, filename) = os.path.split(name)
-        if filename == '':
-            # directory
-            new_dir = destination + '/' + dir_name
-            if not os.path.exists(new_dir):
-                os.mkdir(new_dir)
-        else:
-            # file
-            fd = open(destination + '/' + name, 'wb')
-            print 'Extracting %s' % name
-            fd.write(zfile.read(name))
-            fd.close()
+    print "Extracting the IAG Toolkit to %s. This will take a sec..." % destination
+    
+    zfile.extractall(destination)
     zfile.close()
 
 
@@ -88,7 +78,7 @@ if __name__ == '__main__':
     working_directory = os.getcwd()
     zip_path = os.path.join(working_directory, "pychamp.zip")
     dest_path = os.path.expanduser("~")
-    
+	
     unzip(zip_path, dest_path)
 
     print 'Creating shortcut...'
